@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\MDK"
+    "\\obj\\x64",
+    "\\obj\\x64\\Debug"
   ],
+  "SelectedNode": "\\atol_ship.csproj",
   "PreviewInSolutionExplorer": false
 }

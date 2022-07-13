@@ -24,10 +24,81 @@ namespace IngameScript
     {
         public class StatorController
         {
-            public bool RotateStatorTo(IMyMotorAdvancedStator stator,float angle)
+            public float SimplifyAngle(float angle)
             {
+                if (angle < 3.12f)
+                {
+                    return angle;
+                }
+                else
+                {
+                    return angle - 6.24f;
+                }
+            }
 
-                return true;
+            public bool MoveRotatorToRotation(float time, float speed, float rotation, IMyMotorAdvancedStator hinge)
+            {
+                float dif = Math.Abs(SimplifyAngle(hinge.Angle) - rotation);
+                if (SimplifyAngle(hinge.Angle) > rotation + 0.05f)
+                {
+                    if (dif < 3.12f)
+                    {
+                        if (dif > 0.01f * speed)
+                        {
+                            hinge.SetValueFloat("Velocity", -speed);
+                        }
+                        else
+                        {
+                            hinge.SetValueFloat("Velocity", Math.Min((-0.5f * speed), 4f));
+                        }
+                        return false;
+
+                    }
+                    else
+                    {
+                        if (dif > 0.01f * speed)
+                        {
+                            hinge.SetValueFloat("Velocity", speed);
+                        }
+                        else
+                        {
+                            hinge.SetValueFloat("Velocity", Math.Min((0.5f * speed), 4f));
+                        }
+                    }
+                    return false;
+                }
+                else if (SimplifyAngle(hinge.Angle) < rotation - 0.05f)
+                {
+                    if (dif < 3.12f)
+                    {
+                        if (dif > 0.01f * speed)
+                        {
+                            hinge.SetValueFloat("Velocity", speed);
+                        }
+                        else
+                        {
+                            hinge.SetValueFloat("Velocity", Math.Min((0.5f * speed), 4f));
+                        }
+                        return false;
+                    }
+                    else
+                    {
+                        if (dif > 0.01f * speed)
+                        {
+                            hinge.SetValueFloat("Velocity", -speed);
+                        }
+                        else
+                        {
+                            hinge.SetValueFloat("Velocity", Math.Min((-0.5f * speed), 4f));
+                        }
+                        return false;
+                    }
+                }
+                else
+                {
+                    hinge.SetValueFloat("Velocity", 0f);
+                    return true;
+                }
             }
         }
     }

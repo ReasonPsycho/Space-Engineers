@@ -24,26 +24,37 @@ namespace IngameScript
     {
         public class VTOL_thruster
         {
-            bool isFunctional;
-            string prefix;
-            IMyMotorAdvancedStator rotor;
-            IMyMotorAdvancedStator hinge;
-            IMyThrust thruster;
-
-            public VTOL_thruster(string _prefix, MyGridProgram grid)
+            public bool isFunctional;
+            public string prefix;
+            private IMyMotorAdvancedStator rotor;
+            private IMyMotorAdvancedStator hinge;
+            private IMyThrust thruster;
+            private StatorController controller;
+            public VTOL_thruster(string _prefix, MyGridProgram grid, StatorController _controller)
             {
                 prefix = _prefix;
                 isFunctional = true;
+                controller = _controller;
                 try
                 {
                     rotor = grid.GridTerminalSystem.GetBlockWithName(prefix + " Rotor") as IMyMotorAdvancedStator;
                     hinge = grid.GridTerminalSystem.GetBlockWithName(prefix + " Hinge") as IMyMotorAdvancedStator;
                     thruster = grid.GridTerminalSystem.GetBlockWithName(prefix + " Thruster") as IMyThrust;
+
+                    if (rotor == null || hinge == null || rotor == null)
+                    {
+                        isFunctional = false;
+                    }
                 }
                 catch
                 {
                     isFunctional = false;
                 }
+            }
+            public void ResetStatorsRotations()
+            {
+                controller.MoveRotatorToRotation(2,0.1f,0,rotor); 
+                controller.MoveRotatorToRotation(2, 0.1f, 0,hinge);
             }
         }
     }
