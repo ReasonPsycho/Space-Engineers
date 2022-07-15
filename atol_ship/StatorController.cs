@@ -36,14 +36,14 @@ namespace IngameScript
                 }
             }
 
-            public bool MoveRotatorToRotation(float time, float speed, float rotation, IMyMotorAdvancedStator hinge)
+            public bool MoveRotatorToRotation(float speed, float precision, float  rotation, IMyMotorAdvancedStator hinge)
             {
                 float dif = Math.Abs(SimplifyAngle(hinge.Angle) - rotation);
                 if (SimplifyAngle(hinge.Angle) > rotation + 0.05f)
                 {
                     if (dif < 3.12f)
                     {
-                        if (dif > 0.01f * speed)
+                        if (dif > precision * speed)
                         {
                             hinge.SetValueFloat("Velocity", -speed);
                         }
@@ -56,7 +56,7 @@ namespace IngameScript
                     }
                     else
                     {
-                        if (dif > 0.01f * speed)
+                        if (dif > precision * speed)
                         {
                             hinge.SetValueFloat("Velocity", speed);
                         }
@@ -71,7 +71,7 @@ namespace IngameScript
                 {
                     if (dif < 3.12f)
                     {
-                        if (dif > 0.01f * speed)
+                        if (dif > precision * speed)
                         {
                             hinge.SetValueFloat("Velocity", speed);
                         }
@@ -83,7 +83,7 @@ namespace IngameScript
                     }
                     else
                     {
-                        if (dif > 0.01f * speed)
+                        if (dif > precision * speed)
                         {
                             hinge.SetValueFloat("Velocity", -speed);
                         }

@@ -43,19 +43,14 @@ namespace IngameScript
         //
         // to learn more about ingame scripts.
 
-        VTOL_thruster rightThruster;
-        VTOL_thruster leftThruster;
-        StatorController controller;
+        ATOL_ship ship;
+        StatorController statorController;
 
         public Program()
         {
             Runtime.UpdateFrequency = UpdateFrequency.Update1;   // Configure this program to run the Main method every 1 update ticks
-            controller = new StatorController();
-            rightThruster = new VTOL_thruster("Right",this, controller);
-            leftThruster = new VTOL_thruster("Left", this, controller);
-            Echo(rightThruster.isFunctional.ToString());
-            Echo(leftThruster.isFunctional.ToString());
-
+            statorController = new StatorController();
+            ship = new ATOL_ship(this, statorController);
             // The constructor, called only once every session and
             // always before any other method is called. Use it to
             // initialize your script. 
@@ -80,8 +75,9 @@ namespace IngameScript
   
         public void Main(string argument, UpdateType updateSource)
         {
-            rightThruster.ResetStatorsRotations();
-            leftThruster.ResetStatorsRotations();
+            Echo(ship.DEBUG());
+            Echo(ship.isFuntional.ToString());
+            ship.Fly();
 
             // The main entry point of the script, invoked every time
             // one of the programmable block's Run actions are invoked,

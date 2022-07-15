@@ -26,22 +26,26 @@ namespace IngameScript
         {
             public bool isFunctional;
             public string prefix;
-            private IMyMotorAdvancedStator rotor;
-            private IMyMotorAdvancedStator hinge;
+            private IMyMotorAdvancedStator rotorX;
+            private IMyMotorAdvancedStator rotorY;
+            private IMyMotorAdvancedStator rotorZ;
             private IMyThrust thruster;
-            private StatorController controller;
-            public VTOL_thruster(string _prefix, MyGridProgram grid, StatorController _controller)
+            private StatorController statorController;
+            private Vector3 rotation;
+            public VTOL_thruster(string _prefix, MyGridProgram grid, StatorController _statorController, Vector3 _rotation)
             {
                 prefix = _prefix;
                 isFunctional = true;
-                controller = _controller;
+                statorController = _statorController;
+                rotation = _rotation;
                 try
                 {
-                    rotor = grid.GridTerminalSystem.GetBlockWithName(prefix + " Rotor") as IMyMotorAdvancedStator;
-                    hinge = grid.GridTerminalSystem.GetBlockWithName(prefix + " Hinge") as IMyMotorAdvancedStator;
+                    rotorX = grid.GridTerminalSystem.GetBlockWithName(prefix + " Rotor X") as IMyMotorAdvancedStator;
+                    rotorY = grid.GridTerminalSystem.GetBlockWithName(prefix + " Rotor Y") as IMyMotorAdvancedStator;
+                    rotorZ = grid.GridTerminalSystem.GetBlockWithName(prefix + " Rotor Z") as IMyMotorAdvancedStator;
                     thruster = grid.GridTerminalSystem.GetBlockWithName(prefix + " Thruster") as IMyThrust;
 
-                    if (rotor == null || hinge == null || rotor == null)
+                    if (rotorX == null || rotorY == null || rotorZ == null || thruster == null)
                     {
                         isFunctional = false;
                     }
@@ -51,10 +55,58 @@ namespace IngameScript
                     isFunctional = false;
                 }
             }
+
+            public bool FaceThrusterToDirection(Vector3 direction)
+            {
+                bool isReady = true;
+                if (direction == Vector3.Zero)
+                {
+                    ResetStatorsRotations();
+                    return false;
+                }
+                else
+                {
+                    Vector3.Transform(direction, Quaternion.CreateFromTwoVectors(Vector3.Forward, rotation));
+                    Quaternion rotateTo = Quaternion.CreateFromTwoVectors(Vector3.Forward, direction);
+
+                    if (!statorController.MoveRotatorToRotation(1f, 0.001f, rotateTo.X, rotorX))
+                    {
+                        isReady = false;
+                    }
+                    if (!statorController.MoveRotatorToRotation(1f, 0.001f, rotateTo.Y, rotorY))
+                    {
+                        isReady = false;
+                    }
+                    if (!statorController.MoveRotatorToRotation(1f, 0.001f, rotateTo.Z, rotorZ))
+                    {
+                        isReady = false;
+                    }
+                }
+                return isReady;
+
+
+            }
+
+            public void Fly(Vector3 direction, float percentageSpeed)
+            {
+                if (isFunctional)
+                {
+                    if (FaceThrusterToDirection(direction))
+                    {
+                        thruster.ThrustOverridePercentage = percentageSpeed;
+                    }
+                    else
+                    {
+                        thruster.ThrustOverridePercentage = 0;
+                    }
+                }
+            }
+
             public void ResetStatorsRotations()
             {
-                controller.MoveRotatorToRotation(2,0.1f,0,rotor); 
-                controller.MoveRotatorToRotation(2, 0.1f, 0,hinge);
+                statorController.MoveRotatorToRotation(1f, 0.001f, 0, rotorX);
+                statorController.MoveRotatorToRotation(1f, 0.001f, 0, rotorY);
+                statorController.MoveRotatorToRotation(1f, 0.001f, 0, rotorZ);
             }
         }
     }
