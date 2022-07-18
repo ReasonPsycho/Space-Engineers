@@ -26,12 +26,13 @@ namespace IngameScript
         {
             public bool isFuntional;
             public float percentageSpeed;
+            public string log;
             private IMyShipController shipController;
             private IMyCockpit cockpit;
             private VTOL_thruster rightThruster;
             private VTOL_thruster leftThruster;
             private StatorController statorController;
-
+            private IMyTextSurface cockpitPanel;
             public ATOL_ship(MyGridProgram grid, StatorController _statorController)
             {
                 try
@@ -39,6 +40,7 @@ namespace IngameScript
                     isFuntional = true;
                     shipController = grid.GridTerminalSystem.GetBlockWithName("Cockpit") as IMyShipController;
                     cockpit = grid.GridTerminalSystem.GetBlockWithName("Cockpit") as IMyCockpit;
+                    cockpitPanel = cockpit.GetSurface(0) as IMyTextSurface;
                     if (cockpit == null)
                     {
                         isFuntional = false;
@@ -65,8 +67,18 @@ namespace IngameScript
             {
                 if (isFuntional)
                 {
-                    leftThruster.Fly(cockpit.MoveIndicator, 0.1f);
-                    rightThruster.Fly(cockpit.MoveIndicator, 0.1f);
+                    if (cockpit.MoveIndicator != Vector3.Zero)
+                    {
+                        leftThruster.Fly(cockpit.MoveIndicator, 0.1f);
+                        rightThruster.Fly(cockpit.MoveIndicator, 0.1f);
+                        log += leftThruster.log += rightThruster.log;
+                    }
+                    //else if (cockpit.DampenersOverride && (float)cockpit.GetShipVelocities().LinearVelocity.LengthSquared() > (float)(Vector3.One.LengthSquared()))
+                   // {
+                   //     leftThruster.Fly(cockpit.GetShipVelocities().LinearVelocity, 0f);
+                   //     rightThruster.Fly(cockpit.GetShipVelocities().LinearVelocity, 0f);
+                   //    
+                   // }
                 }
             }
 
@@ -76,12 +88,15 @@ namespace IngameScript
                 rightThruster.ResetStatorsRotations();
             }
 
-            public string DEBUG()
+            public void DEBUG()
             {
-                if (isFuntional)
-                    return cockpit.MoveIndicator.ToString();
-                else
-                    return null;
+                if (cockpitPanel != null && isFuntional)
+                {
+                    cockpitPanel.WriteText(log);
+                    log = " ";
+                    rightThruster.log = " ";
+                    leftThruster.log = " ";
+                }
             }
         }
     }

@@ -26,6 +26,7 @@ namespace IngameScript
         {
             public bool isFunctional;
             public string prefix;
+            public string log;
             private IMyMotorAdvancedStator rotorX;
             private IMyMotorAdvancedStator rotorY;
             private IMyMotorAdvancedStator rotorZ;
@@ -55,9 +56,45 @@ namespace IngameScript
                     isFunctional = false;
                 }
             }
+            static float AngleBetween(Vector3 u, Vector3 v) // EVEN MORE LOVE http://james-ramsden.com/angle-between-two-vectors/
+            {
+                double toppart = 0;
+                toppart += u.X * v.X;
+                toppart += u.Y * v.Y;
+                toppart += u.Z * v.Z;
+                double u2 = 0; //u squared
+                double v2 = 0; //v squared
 
+                u2 += u.X * u.X;
+                v2 += v.X * v.X;
+                u2 += u.Y * u.Y;
+                v2 += v.Y * v.Y;
+                u2 += u.Z * u.Z;
+                v2 += v.Z * v.Z;
+
+                double bottompart = 0;
+                bottompart = Math.Sqrt(u2 * v2);
+
+                double rtnval = Math.Acos(toppart / bottompart);
+                rtnval *= 360.0 / (2 * Math.PI);
+                return (float) rtnval;
+            }
+            public static Quaternion AngleAxis(float aAngle, Vector3 aAxis) // LOVE https://answers.unity.com/questions/1668856/whats-the-source-code-of-quaternionfromtorotation.html
+            {
+                aAxis.Normalize();
+                float rad = aAngle * 0.5f;
+                aAxis *= (float)Math.Sin(rad);
+                return new Quaternion(new Vector3(aAxis.X, aAxis.Y, aAxis.Z), (float)Math.Cos(rad));
+            }
+            public static Quaternion FromToRotation(Vector3 aFrom, Vector3 aTo)
+            {
+                Vector3 axis = Vector3.Cross(aFrom, aTo);
+                float angle = AngleBetween(aFrom, aTo);
+                return AngleAxis(angle, Vector3.Normalize(axis));
+            }
             public bool FaceThrusterToDirection(Vector3 direction)
             {
+                log += "Direction: " + direction.ToString() + "\n";
                 bool isReady = true;
                 if (direction == Vector3.Zero)
                 {
@@ -66,18 +103,34 @@ namespace IngameScript
                 }
                 else
                 {
-                    Vector3.Transform(direction, Quaternion.CreateFromTwoVectors(Vector3.Forward, rotation));
-                    Quaternion rotateTo = Quaternion.CreateFromTwoVectors(Vector3.Forward, direction);
+                    Quaternion rotateTo = Quaternion.Zero;
+                    if (direction == Vector3.Forward)
+                    {
 
-                    if (!statorController.MoveRotatorToRotation(1f, 0.001f, rotateTo.X, rotorX))
+                    }else if (direction != Vector3.Backward)
+                    {
+                        Vector3.Transform(direction, FromToRotation(Vector3.Forward, rotation));
+                        rotateTo = FromToRotation(Vector3.Forward, direction);
+                    }else
+                    {
+                        rotateTo = new Quaternion(0, -(float)Math.PI/2, 0, 0);
+                    }
+                    
+                    log += ",transformed direction: " + direction.ToString() + "\n";
+                    log += ",rotateTo quaternion: " + rotateTo.ToString() + ".\n";
+                    if(rotation == Vector3.Right) // Really just spaghetti, but hey as long it works!
+                    {
+                        rotateTo.X = -rotateTo.X;
+                    }
+                    if (!statorController.MoveRotorToRotation(2f, 0.1f, rotateTo.X*2, rotorX))
                     {
                         isReady = false;
                     }
-                    if (!statorController.MoveRotatorToRotation(1f, 0.001f, rotateTo.Y, rotorY))
+                    if (!statorController.MoveRotorToRotation(2f, 0.1f, rotateTo.Y*2, rotorY))
                     {
                         isReady = false;
                     }
-                    if (!statorController.MoveRotatorToRotation(1f, 0.001f, rotateTo.Z, rotorZ))
+                    if (!statorController.MoveRotorToRotation(2f, 0.1f, rotateTo.Z*2, rotorZ))
                     {
                         isReady = false;
                     }
@@ -104,9 +157,9 @@ namespace IngameScript
 
             public void ResetStatorsRotations()
             {
-                statorController.MoveRotatorToRotation(1f, 0.001f, 0, rotorX);
-                statorController.MoveRotatorToRotation(1f, 0.001f, 0, rotorY);
-                statorController.MoveRotatorToRotation(1f, 0.001f, 0, rotorZ);
+                statorController.MoveRotorToRotation(2f, 0.1f, 0f, rotorX);
+                statorController.MoveRotorToRotation(2f, 0.1f, 0f, rotorY);
+                statorController.MoveRotorToRotation(2f, 0.1f, 0f, rotorZ);
             }
         }
     }

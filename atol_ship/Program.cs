@@ -18,10 +18,14 @@ using VRage.Game.ModAPI.Ingame.Utilities;
 using VRage.Game.ObjectBuilders.Definitions;
 using VRageMath;
 
+
 namespace IngameScript
 {
+  
+
     partial class Program : MyGridProgram
     {
+           
         // This file contains your actual script.
         //
         // You can either keep all your code here, or you can create separate
@@ -75,10 +79,8 @@ namespace IngameScript
   
         public void Main(string argument, UpdateType updateSource)
         {
-            Echo(ship.DEBUG());
-            Echo(ship.isFuntional.ToString());
             ship.Fly();
-
+            ship.DEBUG();
             // The main entry point of the script, invoked every time
             // one of the programmable block's Run actions are invoked,
             // or the script updates itself. The updateSource argument

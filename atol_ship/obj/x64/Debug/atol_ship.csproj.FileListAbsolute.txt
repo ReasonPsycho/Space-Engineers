@@ -112,9 +112,9 @@ C:\Users\redkc\source\repos\Space-Engineers\atol_ship\bin\SixLabors.Core.dll
 C:\Users\redkc\source\repos\Space-Engineers\atol_ship\bin\System.Numerics.Vectors.dll
 C:\Users\redkc\source\repos\Space-Engineers\atol_ship\bin\SixLabors.ImageSharp.xml
 C:\Users\redkc\source\repos\Space-Engineers\atol_ship\bin\SixLabors.Core.xml
-C:\Users\redkc\source\repos\Space-Engineers\atol_ship\obj\x64\Debug\atol_ship.csproj.AssemblyReference.cache
 C:\Users\redkc\source\repos\Space-Engineers\atol_ship\obj\x64\Debug\atol_ship.exe.config
 C:\Users\redkc\source\repos\Space-Engineers\atol_ship\obj\x64\Debug\atol_ship.csproj.CoreCompileInputs.cache
 C:\Users\redkc\source\repos\Space-Engineers\atol_ship\obj\x64\Debug\atol_ship.csproj.CopyComplete
 C:\Users\redkc\source\repos\Space-Engineers\atol_ship\obj\x64\Debug\atol_ship.exe
 C:\Users\redkc\source\repos\Space-Engineers\atol_ship\obj\x64\Debug\atol_ship.pdb
+C:\Users\redkc\source\repos\Space-Engineers\atol_ship\obj\x64\Debug\atol_ship.csproj.AssemblyReference.cache

@@ -48,10 +48,13 @@
     </AdditionalFiles>
     <Compile Include="Program.cs" />
     <AdditionalFiles Include="Instructions.readme" />
-    <AdditionalFiles Include="thumb.png" />
+    <AdditionalFiles Include="org.png" />
     <AdditionalFiles Include="MDK\whitelist.cache" />
     <Compile Include="StatorController.cs" />
     <Compile Include="VTOL_thruster.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="thumb.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="AfterBuild">
