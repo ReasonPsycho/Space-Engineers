@@ -77,7 +77,7 @@ namespace IngameScript
                 }
             }
 
-            public void FlyTo(Vector3 dierction,float speed)
+            public void FlyTo(Vector3 dierction,float speed,float rotataionSpeed)
             {
                 if (isFuntional)
                 {
@@ -85,18 +85,18 @@ namespace IngameScript
                   
                     if (dierction.X < 0)
                     {
-                        leftThruster.Fly(dierction, speed);
-                        rightThruster.Fly(Vector3.Zero, 0f);
+                        leftThruster.Fly(dierction, speed, rotataionSpeed);
+                        rightThruster.Fly(Vector3.Zero, 0f, rotataionSpeed/2);
                     }
                     else if (dierction.X > 0)
                     {
-                        rightThruster.Fly(dierction, speed);
-                        leftThruster.Fly(Vector3.Zero, 0f);
+                        rightThruster.Fly(dierction, speed, rotataionSpeed);
+                        leftThruster.Fly(Vector3.Zero, 0f, rotataionSpeed/2);
                     }
                     else
                     {
-                        leftThruster.Fly(dierction, speed);
-                        rightThruster.Fly(dierction, speed);
+                        leftThruster.Fly(dierction, speed, rotataionSpeed);
+                        rightThruster.Fly(dierction, speed, rotataionSpeed);
                     }
                 }
             }
@@ -110,7 +110,7 @@ namespace IngameScript
                     {
                         Vector3 dir = cockpit.MoveIndicator;
                         dir.X = -dir.X;
-                        FlyTo(dir, 1f);
+                        FlyTo(dir, 1f,6f);
 
                     }
                     else if(cockpit.DampenersOverride && (float)cockpit.GetShipVelocities().LinearVelocity.LengthSquared() > (float)(Vector3.One.LengthSquared()))
@@ -118,15 +118,18 @@ namespace IngameScript
                         Quaternion shipOrientation = Quaternion.CreateFromRotationMatrix(cockpit.WorldMatrix.GetOrientation());
                         logs[0] = shipOrientation.ToString() + "\n";
 
-                        Vector3.Transform(cockpit.GetShipVelocities().LinearVelocity, shipOrientation);
+                        Vector3 dir = Vector3.Transform(cockpit.GetShipVelocities().LinearVelocity, shipOrientation);
+                        dir.Normalize();
+                        logs[0] = (dir).ToString() + "\n";
+
                         shipOrientation.X = -shipOrientation.X;
                         shipOrientation.Z = -shipOrientation.Z;
-                        FlyTo(cockpit.GetShipVelocities().LinearVelocity, 0);
+                        FlyTo(dir, 0,2f);
                     }
                     else
                     {
-                        leftThruster.Fly(Vector3.Zero, 0f);
-                        rightThruster.Fly(Vector3.Zero, 0f);
+                        leftThruster.Fly(Vector3.Left, 0f,3f);
+                        rightThruster.Fly(Vector3.Right, 0f, 3f);
                     }
                     logs[0] += leftThruster.logs[0] += rightThruster.logs[0];
                     logs[1] = leftThruster.logs[1];

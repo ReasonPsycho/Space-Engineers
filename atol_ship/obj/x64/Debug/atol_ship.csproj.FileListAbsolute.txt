@@ -117,4 +117,3 @@ C:\Users\redkc\source\repos\Space-Engineers\atol_ship\obj\x64\Debug\atol_ship.cs
 C:\Users\redkc\source\repos\Space-Engineers\atol_ship\obj\x64\Debug\atol_ship.csproj.CopyComplete
 C:\Users\redkc\source\repos\Space-Engineers\atol_ship\obj\x64\Debug\atol_ship.exe
 C:\Users\redkc\source\repos\Space-Engineers\atol_ship\obj\x64\Debug\atol_ship.pdb
-C:\Users\redkc\source\repos\Space-Engineers\atol_ship\obj\x64\Debug\atol_ship.csproj.AssemblyReference.cache
