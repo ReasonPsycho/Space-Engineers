@@ -25,14 +25,15 @@ namespace IngameScript
         public class ATOL_ship
         {
             public bool isFuntional;
-            public float percentageSpeed;
-            public string log;
+            public string[] logs;
             private IMyShipController shipController;
             private IMyCockpit cockpit;
             private VTOL_thruster rightThruster;
             private VTOL_thruster leftThruster;
             private StatorController statorController;
-            private IMyTextSurface cockpitPanel;
+            private IMyTextSurface mainCockpitPanel;
+            private IMyTextSurface leftCockpitPanel;
+            private IMyTextSurface rightCockpitPanel;
             public ATOL_ship(MyGridProgram grid, StatorController _statorController)
             {
                 try
@@ -40,7 +41,20 @@ namespace IngameScript
                     isFuntional = true;
                     shipController = grid.GridTerminalSystem.GetBlockWithName("Cockpit") as IMyShipController;
                     cockpit = grid.GridTerminalSystem.GetBlockWithName("Cockpit") as IMyCockpit;
-                    cockpitPanel = cockpit.GetSurface(0) as IMyTextSurface;
+                    mainCockpitPanel = cockpit.GetSurface(0) as IMyTextSurface;
+                    leftCockpitPanel = cockpit.GetSurface(1) as IMyTextSurface;
+                    rightCockpitPanel = cockpit.GetSurface(2) as IMyTextSurface;
+                    if(mainCockpitPanel != null && leftCockpitPanel != null && rightCockpitPanel != null)
+                    {
+                        Color color = new Color(0, 100, 150);
+                        mainCockpitPanel.BackgroundColor = color;
+                        leftCockpitPanel.BackgroundColor = color;
+                        rightCockpitPanel.BackgroundColor = color;
+                    }
+                    logs = new string[3];
+                    logs[0] = "";
+                    logs[1] = "";
+                    logs[2] = "";
                     if (cockpit == null)
                     {
                         isFuntional = false;
@@ -63,22 +77,60 @@ namespace IngameScript
                 }
             }
 
+            public void FlyTo(Vector3 dierction,float speed)
+            {
+                if (isFuntional)
+                {
+                    dierction = Vector3.Normalize(dierction);
+                  
+                    if (dierction.X < 0)
+                    {
+                        leftThruster.Fly(dierction, speed);
+                        rightThruster.Fly(Vector3.Zero, 0f);
+                    }
+                    else if (dierction.X > 0)
+                    {
+                        rightThruster.Fly(dierction, speed);
+                        leftThruster.Fly(Vector3.Zero, 0f);
+                    }
+                    else
+                    {
+                        leftThruster.Fly(dierction, speed);
+                        rightThruster.Fly(dierction, speed);
+                    }
+                }
+            }
+
             public void Fly()
             {
                 if (isFuntional)
                 {
+                    logs[0] = "";
                     if (cockpit.MoveIndicator != Vector3.Zero)
                     {
-                        leftThruster.Fly(cockpit.MoveIndicator, 0.1f);
-                        rightThruster.Fly(cockpit.MoveIndicator, 0.1f);
-                        log += leftThruster.log += rightThruster.log;
+                        Vector3 dir = cockpit.MoveIndicator;
+                        dir.X = -dir.X;
+                        FlyTo(dir, 1f);
+
                     }
-                    //else if (cockpit.DampenersOverride && (float)cockpit.GetShipVelocities().LinearVelocity.LengthSquared() > (float)(Vector3.One.LengthSquared()))
-                   // {
-                   //     leftThruster.Fly(cockpit.GetShipVelocities().LinearVelocity, 0f);
-                   //     rightThruster.Fly(cockpit.GetShipVelocities().LinearVelocity, 0f);
-                   //    
-                   // }
+                    else if(cockpit.DampenersOverride && (float)cockpit.GetShipVelocities().LinearVelocity.LengthSquared() > (float)(Vector3.One.LengthSquared()))
+                    {
+                        Quaternion shipOrientation = Quaternion.CreateFromRotationMatrix(cockpit.WorldMatrix.GetOrientation());
+                        logs[0] = shipOrientation.ToString() + "\n";
+
+                        Vector3.Transform(cockpit.GetShipVelocities().LinearVelocity, shipOrientation);
+                        shipOrientation.X = -shipOrientation.X;
+                        shipOrientation.Z = -shipOrientation.Z;
+                        FlyTo(cockpit.GetShipVelocities().LinearVelocity, 0);
+                    }
+                    else
+                    {
+                        leftThruster.Fly(Vector3.Zero, 0f);
+                        rightThruster.Fly(Vector3.Zero, 0f);
+                    }
+                    logs[0] += leftThruster.logs[0] += rightThruster.logs[0];
+                    logs[1] = leftThruster.logs[1];
+                    logs[2] = rightThruster.logs[1];
                 }
             }
 
@@ -90,12 +142,14 @@ namespace IngameScript
 
             public void DEBUG()
             {
-                if (cockpitPanel != null && isFuntional)
+                if ((mainCockpitPanel != null && leftCockpitPanel != null && rightCockpitPanel != null) && isFuntional)
                 {
-                    cockpitPanel.WriteText(log);
-                    log = " ";
-                    rightThruster.log = " ";
-                    leftThruster.log = " ";
+                    mainCockpitPanel.WriteText(logs[0]);
+                    leftCockpitPanel.WriteText(logs[1]);
+                    rightCockpitPanel.WriteText(logs[2]);
+                    logs[0] = "";
+                    logs[1] = "";
+                    logs[2] = "";
                 }
             }
         }

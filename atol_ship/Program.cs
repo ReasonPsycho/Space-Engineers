@@ -52,6 +52,13 @@ namespace IngameScript
 
         public Program()
         {
+            IMyMotorAdvancedStator leftRotorY = GridTerminalSystem.GetBlockWithName("Left" + " Rotor Y") as IMyMotorAdvancedStator;
+            IMyMotorAdvancedStator rightRotorY = GridTerminalSystem.GetBlockWithName("Right" + " Rotor Y") as IMyMotorAdvancedStator;
+
+            leftRotorY.UpperLimitRad = (float)-Math.PI;
+            leftRotorY.LowerLimitRad = (float)-Math.PI * 2;
+            rightRotorY.UpperLimitRad = (float)Math.PI * 2;
+            rightRotorY.LowerLimitRad = (float)Math.PI;
             Runtime.UpdateFrequency = UpdateFrequency.Update1;   // Configure this program to run the Main method every 1 update ticks
             statorController = new StatorController();
             ship = new ATOL_ship(this, statorController);

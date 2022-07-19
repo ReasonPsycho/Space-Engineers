@@ -26,7 +26,7 @@ namespace IngameScript
         {
             public bool isFunctional;
             public string prefix;
-            public string log;
+            public string[] logs;
             private IMyMotorAdvancedStator rotorX;
             private IMyMotorAdvancedStator rotorY;
             private IMyMotorAdvancedStator rotorZ;
@@ -35,6 +35,9 @@ namespace IngameScript
             private Vector3 rotation;
             public VTOL_thruster(string _prefix, MyGridProgram grid, StatorController _statorController, Vector3 _rotation)
             {
+                logs = new string[2];
+                logs[0] = "";
+                logs[1] = "";
                 prefix = _prefix;
                 isFunctional = true;
                 statorController = _statorController;
@@ -94,7 +97,9 @@ namespace IngameScript
             }
             public bool FaceThrusterToDirection(Vector3 direction)
             {
-                log += "Direction: " + direction.ToString() + "\n";
+                logs[0] = ""; 
+                logs[0] += prefix + " VTOL thruster is rotating to a: \n";
+                logs[0] += "direction: " + direction.ToString() + "\n";
                 bool isReady = true;
                 if (direction == Vector3.Zero)
                 {
@@ -104,35 +109,48 @@ namespace IngameScript
                 else
                 {
                     Quaternion rotateTo = Quaternion.Zero;
-                    if (direction == Vector3.Forward)
+                    if (direction == Vector3.Forward) // Just face backwards
                     {
 
-                    }else if (direction != Vector3.Backward)
+                    }else if (direction != Vector3.Backward) 
                     {
                         Vector3.Transform(direction, FromToRotation(Vector3.Forward, rotation));
                         rotateTo = FromToRotation(Vector3.Forward, direction);
-                    }else
+                        if(direction.Z < 0) // reverse x
+                        {
+                            rotateTo.X = -rotateTo.X;
+                        }
+                    }
+                    else // Just face forward
                     {
                         rotateTo = new Quaternion(0, -(float)Math.PI/2, 0, 0);
                     }
-                    
-                    log += ",transformed direction: " + direction.ToString() + "\n";
-                    log += ",rotateTo quaternion: " + rotateTo.ToString() + ".\n";
-                    if(rotation == Vector3.Right) // Really just spaghetti, but hey as long it works!
+
+                    logs[0] += "transformed direction: " + direction.ToString() + "\n";
+                    if(rotation == Vector3.Right) // Really just spaghetti, but hey as long it works! TODO fix rotating depending of dierectiuon
                     {
                         rotateTo.X = -rotateTo.X;
+                        if(direction.Z == -1)
+                        {
+                            rotateTo.Y = (float)Math.PI;
+                        }
                     }
-                    if (!statorController.MoveRotorToRotation(2f, 0.1f, rotateTo.X*2, rotorX))
+                    logs[0] += "rotateTo quaternion: " + rotateTo.ToString() + ".\n";
+                    logs[1] = "";                  
+                    if (!statorController.MoveRotorToRotation(6f, 0.1f, rotateTo.X*2, rotorX))
                     {
                         isReady = false;
+                        logs[1] += statorController.log;
                     }
-                    if (!statorController.MoveRotorToRotation(2f, 0.1f, rotateTo.Y*2, rotorY))
+                    if (!statorController.MoveRotorToRotation(6f, 0.1f, rotateTo.Y*2, rotorY))
                     {
                         isReady = false;
+                        logs[1] += statorController.log;
                     }
-                    if (!statorController.MoveRotorToRotation(2f, 0.1f, rotateTo.Z*2, rotorZ))
+                    if (!statorController.MoveRotorToRotation(6f, 0.1f, rotateTo.Z*2, rotorZ))
                     {
                         isReady = false;
+                        logs[1] += statorController.log;
                     }
                 }
                 return isReady;
@@ -146,20 +164,21 @@ namespace IngameScript
                 {
                     if (FaceThrusterToDirection(direction))
                     {
+                        thruster.Enabled = true;
                         thruster.ThrustOverridePercentage = percentageSpeed;
                     }
                     else
                     {
-                        thruster.ThrustOverridePercentage = 0;
+                        thruster.Enabled = false;
                     }
                 }
             }
 
             public void ResetStatorsRotations()
             {
-                statorController.MoveRotorToRotation(2f, 0.1f, 0f, rotorX);
-                statorController.MoveRotorToRotation(2f, 0.1f, 0f, rotorY);
-                statorController.MoveRotorToRotation(2f, 0.1f, 0f, rotorZ);
+                statorController.MoveRotorToRotation(4f, 0.1f, 0f, rotorX);
+                statorController.MoveRotorToRotation(4f, 0.1f, 0f, rotorY);
+                statorController.MoveRotorToRotation(4f, 0.1f, 0f, rotorZ);
             }
         }
     }
