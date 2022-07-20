@@ -38,7 +38,7 @@
   <Import Project="MDK/MDK.options.props" />
   <Import Project="MDK/MDK.paths.props" Condition="exists('MDK/MDK.paths.props')" />
   <ItemGroup>
-    <Compile Include="ATOL_ship.cs" />
+    <Compile Include="ROT_ship.cs" />
     <Compile Include="MDK\Bootstrapper.cs" />
     <AdditionalFiles Include="MDK\MDK.options.props">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -51,7 +51,7 @@
     <AdditionalFiles Include="org.png" />
     <AdditionalFiles Include="MDK\whitelist.cache" />
     <Compile Include="StatorController.cs" />
-    <Compile Include="VTOL_thruster.cs" />
+    <Compile Include="ROT_thruster.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="thumb.jpg" />

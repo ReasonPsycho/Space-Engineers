@@ -22,7 +22,7 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class VTOL_thruster
+        public class ROT_thruster
         {
             public bool isFunctional;
             public string prefix;
@@ -33,7 +33,7 @@ namespace IngameScript
             private IMyThrust thruster;
             private StatorController statorController;
             private Vector3 rotation;
-            public VTOL_thruster(string _prefix, MyGridProgram grid, StatorController _statorController, Vector3 _rotation)
+            public ROT_thruster(string _prefix, MyGridProgram grid, StatorController _statorController, Vector3 _rotation)
             {
                 logs = new string[2];
                 logs[0] = "";
@@ -98,7 +98,7 @@ namespace IngameScript
             public bool FaceThrusterToDirection(Vector3 direction,float roatationSpeed)
             {
                 logs[0] = ""; 
-                logs[0] += prefix + " VTOL thruster is rotating to a: \n";
+                logs[0] += prefix + " ROT thruster is rotating to a: \n";
                 logs[0] += "direction: " + direction.ToString() + "\n";
                 bool isReady = true;
                 if (direction == Vector3.Zero)

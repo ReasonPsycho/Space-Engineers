@@ -22,19 +22,21 @@ namespace IngameScript
 {
     partial class Program
     {
-        public class ATOL_ship
+        public class ROT_ship
         {
             public bool isFuntional;
             public string[] logs;
+            public float speed;
             private IMyShipController shipController;
             private IMyCockpit cockpit;
-            private VTOL_thruster rightThruster;
-            private VTOL_thruster leftThruster;
+            private ROT_thruster rightThruster;
+            private ROT_thruster leftThruster;
             private StatorController statorController;
             private IMyTextSurface mainCockpitPanel;
             private IMyTextSurface leftCockpitPanel;
             private IMyTextSurface rightCockpitPanel;
-            public ATOL_ship(MyGridProgram grid, StatorController _statorController)
+            private MyCommandLine commandLine;
+            public ROT_ship(MyGridProgram grid, StatorController _statorController, MyCommandLine _commandLine)
             {
                 try
                 {
@@ -44,7 +46,8 @@ namespace IngameScript
                     mainCockpitPanel = cockpit.GetSurface(0) as IMyTextSurface;
                     leftCockpitPanel = cockpit.GetSurface(1) as IMyTextSurface;
                     rightCockpitPanel = cockpit.GetSurface(2) as IMyTextSurface;
-                    if(mainCockpitPanel != null && leftCockpitPanel != null && rightCockpitPanel != null)
+                    commandLine = _commandLine;
+                    if (mainCockpitPanel != null && leftCockpitPanel != null && rightCockpitPanel != null)
                     {
                         Color color = new Color(0, 100, 150);
                         mainCockpitPanel.BackgroundColor = color;
@@ -62,8 +65,8 @@ namespace IngameScript
                     else
                     {
                         statorController = _statorController;
-                        rightThruster = new VTOL_thruster("Right", grid, statorController, Vector3.Right);
-                        leftThruster = new VTOL_thruster("Left", grid, statorController, Vector3.Left);
+                        rightThruster = new ROT_thruster("Right", grid, statorController, Vector3.Right);
+                        leftThruster = new ROT_thruster("Left", grid, statorController, Vector3.Left);
                         if(!rightThruster.isFunctional || !leftThruster.isFunctional)
                         {
                             isFuntional = false;
@@ -110,7 +113,7 @@ namespace IngameScript
                     {
                         Vector3 dir = cockpit.MoveIndicator;
                         dir.X = -dir.X;
-                        FlyTo(dir, 1f,6f);
+                        FlyTo(dir, speed, 6f);
 
                     }
                     else if(cockpit.DampenersOverride && (float)cockpit.GetShipVelocities().LinearVelocity.LengthSquared() > (float)(Vector3.One.LengthSquared()))
@@ -153,6 +156,21 @@ namespace IngameScript
                     logs[0] = "";
                     logs[1] = "";
                     logs[2] = "";
+                }
+            }
+
+            public void ShipCommands()
+            {
+
+                // Argument no. 1 is the speed
+                if (commandLine.Argument(1) == "speed")
+                {
+                    float value;
+                    
+                    if(float.TryParse(commandLine.Argument(2),out value))
+                    {
+                        speed = value/100;
+                    }                  
                 }
             }
         }

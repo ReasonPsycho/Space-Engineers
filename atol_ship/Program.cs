@@ -47,8 +47,12 @@ namespace IngameScript
         //
         // to learn more about ingame scripts.
 
-        ATOL_ship ship;
+        ROT_ship ship;
         StatorController statorController;
+        MyCommandLine _commandLine = new MyCommandLine();
+        Dictionary<string, Action> _commands = new Dictionary<string, Action>(StringComparer.OrdinalIgnoreCase);
+
+      
 
         public Program()
         {
@@ -61,7 +65,8 @@ namespace IngameScript
             rightRotorY.LowerLimitRad = (float)Math.PI;
             Runtime.UpdateFrequency = UpdateFrequency.Update1;   // Configure this program to run the Main method every 1 update ticks
             statorController = new StatorController();
-            ship = new ATOL_ship(this, statorController);
+            ship = new ROT_ship(this, statorController,_commandLine);
+            _commands["ship"] = ship.ShipCommands;
             // The constructor, called only once every session and
             // always before any other method is called. Use it to
             // initialize your script. 
@@ -86,6 +91,29 @@ namespace IngameScript
   
         public void Main(string argument, UpdateType updateSource)
         {
+            if (_commandLine.TryParse(argument))
+            {
+                Action commandAction;
+
+                // Retrieve the first argument. Switches are ignored.
+                string command = _commandLine.Argument(0);
+
+                // Now we must validate that the first argument is actually specified, 
+                // then attempt to find the matching command delegate.
+                if (command == null)
+                {
+                    Echo("No command specified");
+                }
+                else if (_commands.TryGetValue(_commandLine.Argument(0), out commandAction))
+                {
+                    // We have found a command. Invoke it.
+                    commandAction();
+                }
+                else
+                {
+                    Echo($"Unknown command {command}");
+                }
+            }
             ship.Fly();
             ship.DEBUG();
             // The main entry point of the script, invoked every time
