@@ -92,7 +92,7 @@ namespace IngameScript
                         rightThruster.Fly(Vector3.Zero, 0f, rotataionSpeed/2);
                     }
                     else if (dierction.X > 0)
-                    {
+                    {                    
                         rightThruster.Fly(dierction, speed, rotataionSpeed);
                         leftThruster.Fly(Vector3.Zero, 0f, rotataionSpeed/2);
                     }
