@@ -131,8 +131,8 @@ namespace IngameScript
                     }
                     else
                     {
-                        leftThruster.Fly(Vector3.Left, 0f,3f);
-                        rightThruster.Fly(Vector3.Right, 0f, 3f);
+                        leftThruster.Fly(Vector3.Zero, 0f,3f);
+                        rightThruster.Fly(Vector3.Zero, 0f, 3f);
                     }
                     logs[0] += leftThruster.logs[0] += rightThruster.logs[0];
                     logs[1] = leftThruster.logs[1];
